@@ -1,0 +1,147 @@
+<html>
+
+<head>
+    <style>
+        .root {
+            background: #1A1A1B;
+            padding: 1em;
+            font-family: sans-serif;
+            font-size: 2em;
+            max-width: 1080px;
+        }
+
+        .encompassing-container {
+            display: flex;
+        }
+
+        .left-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #818384;
+            font-size: 1em;
+            gap: 0.2em;
+        }
+
+        @font-face {
+            font-family: vote;
+            src: url(https://www.redditstatic.com/desktop2x/fonts/redesignIcon2020/redesignFont2020.a59e78115daeedbd9ef7f241a25c2031.ttf)
+        }
+
+        .icon {
+            font-family: vote;
+            font-size: 1.2em;
+        }
+
+        .upvote-icon:before {
+            content: "\f34c";
+        }
+
+        .votes {
+            color: #D7DADC;
+        }
+
+        .downvote-icon:before {
+            content: "\f197";
+        }
+
+        .right-container {
+            margin-left: 0.75em
+        }
+
+        .top-container {
+            display: flex;
+            align-items: center;
+            font-size: 0.65em;
+            gap: 0.35em;
+        }
+
+        .avatar {
+            border-radius: 50%;
+            height: 2em;
+            width: 2em;
+        }
+
+        .subreddit {
+            color: #D7DADC;
+            font-weight: bold;
+        }
+
+        .ago {
+            color: #818384;
+        }
+
+        .middle-container {
+            display: flex;
+            margin-top: 0.5em;
+        }
+
+        .title {
+            color: #D7DADC;
+            font-size: 1.25em
+        }
+
+        .bottom-container {
+            display: flex;
+            color: #818384;
+            margin-top: 1em;
+            align-items: center;
+            gap: 0.35em;
+        }
+
+        .comment-icon:before {
+            content: "\f16f"
+        }
+
+        .award-icon:before {
+            content: "\f123"
+        }
+
+        .share-icon:before {
+            content: "\f280"
+        }
+
+        .ellipsis-icon:before {
+            content: "\f229"
+        }
+
+        .option {
+            font-size: 0.75em;
+            margin-right: 1em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<div class="root">
+    <div class="encompassing-container">
+        <div class="left-container">
+            <div class="icon upvote-icon"></div>
+            <div class="votes">[score]</div>
+            <div class="icon downvote-icon"></div>
+        </div>
+        <div class="right-container">
+            <div class="top-container">
+                <img class="avatar"
+                    src="https://styles.redditmedia.com/t5_2qh1i/styles/communityIcon_tijjpyw1qe201.png?">
+                <div class="subreddit">r/[subreddit]</div>
+                <div class="ago">·</div>
+                <div class="ago">Posted by u/[username]</div>
+            </div>
+            <div class="middle-container">
+                <div class="title">[title]</div>
+            </div>
+            <div class="bottom-container">
+                <div class="icon comment-icon"></div>
+                <div class="option">Comment</div>
+                <div class="icon award-icon"></div>
+                <div class="option">Award</div>
+                <div class="icon share-icon"></div>
+                <div class="option">Share</div>
+                <div class="icon ellipsis-icon"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</html>

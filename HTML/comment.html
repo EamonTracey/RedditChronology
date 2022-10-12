@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <style>
+        .root {
+            background: #1A1A1B;
+            padding: 1em;
+            font-family: sans-serif;
+            font-size: 1.25em;
+            max-width: 1080px;
+        }
+
+        .top-container {
+            display: flex;
+            align-items: center;
+            gap: 0.35em;
+        }
+
+        .avatar {
+            border-radius: 50%;
+            height: 2em;
+            width: 2em;
+        }
+
+        .username {
+            color: #D7DADC;
+        }
+
+        .ago {
+            font-size: 0.75em;
+            color: #818384;
+        }
+
+        .line {
+            margin-left: 1em;
+            border-left: 2px solid gray;
+        }
+
+        .middle-container {
+            display: flex;
+            margin-top: 0.5em;
+            margin-left: 1em;
+        }
+
+        .comment {
+            color: #D7DADC;
+            margin-left: 0.35em;
+        }
+
+        .bottom-container {
+            display: flex; /* display: none; */
+            align-items: center;
+            margin-top: 1em;
+            margin-left: 1.35em;
+            gap: 0.5em;
+            color: #818384;
+        }
+
+        @font-face {
+            font-family: vote;
+            src: url(https://www.redditstatic.com/desktop2x/fonts/redesignIcon2020/redesignFont2020.a59e78115daeedbd9ef7f241a25c2031.ttf)
+        }
+
+        .icon {
+            font-family: vote;
+            font-size: 1.2em;
+        }
+
+        .upvote-icon:before {
+            content: "\f34c";
+        }
+
+        .votes {
+            color: #D7DADC;
+        }
+
+        .downvote-icon:before {
+            content: "\f197";
+        }
+
+        .comment-icon:before {
+            content: "\f16f";
+        }
+
+        .option {
+            font-size: 0.75em;
+        }
+    </style>
+</head>
+
+<div class="root">
+    <div class="top-container">
+        <img class="avatar" src="https://www.redditstatic.com/avatars/avatar_default_01_0079D3.png">
+        <div class="username">[username]</div>
+        <div class="ago">·</div>
+        <div class="ago">sometime ago</div>
+    </div>
+    <div class="line">
+        <div class="middle-container">
+            <div class="comment">[comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] </div>
+        </div>
+        <div class="bottom-container">
+            <div class="icon upvote-icon"></div>
+            <div class="votes">[score]</div>
+            <div class="icon downvote-icon"></div>
+            <div class="icon comment-icon"></div>
+            <div class="option"><b>Reply</b></div>
+            <div class="option"><b>Give Award</b></div>
+            <div class="option"><b>Share</b></div>
+            <div class="option"><b>Report</b></div>
+            <div class="option"><b>Save</b></div>
+            <div class="option"><b>Follow</b></div>
+        </div>
+    </div>
+</div>
+
+</html>
