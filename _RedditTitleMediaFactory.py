@@ -1,7 +1,6 @@
 import html
 import itertools
 import os
-import sys
 
 import praw.models
 from PIL import Image

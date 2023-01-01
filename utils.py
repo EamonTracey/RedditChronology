@@ -1,5 +1,3 @@
-import contextlib
-import os
 import typing
 
 import ffmpeg

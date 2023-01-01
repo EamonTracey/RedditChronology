@@ -1,13 +1,14 @@
 import abc
 import random
 import re
-import tempfile
 
 import html2image
 from google.cloud import texttospeech
 
+from _MediaFactory import _MediaFactory
 
-class _TextMediaFactory(abc.ABC):
+
+class _TextMediaFactory(_MediaFactory, abc.ABC):
     # These characters will be used as delimiters
     # for naturally cutting comment text.
     cut_delimiters = ".,:?!"
@@ -19,7 +20,6 @@ class _TextMediaFactory(abc.ABC):
     def __init__(self, text: str):
         self.text = text
         self.voice_params = self._random_voice_params()
-        self.tmpdir = tempfile.TemporaryDirectory()
         self.hti = html2image.Html2Image(output_path=self.tmpdir.name)
 
         # When manufacturing images and audio, we want
@@ -28,6 +28,8 @@ class _TextMediaFactory(abc.ABC):
         # punctuation including periods, ellipses, commas,
         # colons, question marks, and exclamation points.
         self.text_cuts = self._load_text_cuts()
+
+        super(_TextMediaFactory, self).__init__()
 
     def _load_text_cuts(self) -> list[str]:
         # Cut the text using our regex pattern from above.

@@ -5,13 +5,12 @@ import ffmpeg
 import praw.models
 
 from _RedditCommentMediaFactory import _RedditCommentMediaFactory
+from _MediaFactory import _MediaFactory
 from _RedditTitleMediaFactory import _RedditTitleMediaFactory
 import utils
 
 
-class RedditThreadMediaFactory:
-    tmp = ".RedditThreadMediaFactory.tmp.{}.mp4"
-
+class RedditThreadMediaFactory(_MediaFactory):
     def __init__(
             self, submission: praw.models.Submission,
             auto: bool = True,
@@ -32,6 +31,8 @@ class RedditThreadMediaFactory:
         # If the user does not want the class to choose which comments to
         # include, we have to prompt the user for the relevant comments.
         self.relevant_comments = self._choose_relevant_comments() if auto else self._prompt_relevant_comments()
+
+        super(RedditThreadMediaFactory, self).__init__()
 
     def _choose_relevant_comments(self) -> list[praw.models.Comment]:
         return list(
@@ -120,6 +121,7 @@ class RedditThreadMediaFactory:
                 )
 
         # Now, let's concatenate the streams.
+        tmpmp4 = os.path.join(self.tmpdir.name, "RedditThreadMediaFactory.tmp.{}.mp4")
         # The naive approach is to simply concatenate everything at once.
         # However, since it is likely we must concatenate hundreds or
         # even thousands of files, it is likely ffmpeg will fail.
@@ -133,18 +135,18 @@ class RedditThreadMediaFactory:
         concatenator = ffmpeg.concat(*streams[0:32], a=1, v=1)
         # We set the pixel format to yuv420p so that more
         # media players (e.g., QuickTime) support our mp4.
-        concatenator.output(self.tmp.format(i), r=self.fps, pix_fmt="yuv420p").run()
+        concatenator.output(tmpmp4.format(i), r=self.fps, pix_fmt="yuv420p").run()
         # We are done if the number of streams is less than or equal to 32.
         # Otherwise, concatenate the rest of the streams to the mp4 in chunks.
         for i, streams_chunk in enumerate(utils.chunk(streams[32:], 32), start=1):
-            mp4 = ffmpeg.input(self.tmp.format(i - 1))
+            mp4 = ffmpeg.input(tmpmp4.format(i - 1))
             concatenator = ffmpeg.concat(mp4.video, mp4.audio, *streams_chunk, v=1, a=1)
-            concatenator.output(self.tmp.format(i), r=self.fps, pix_fmt="yuv420p").run()
-            os.remove(self.tmp.format(i - 1))
+            concatenator.output(tmpmp4.format(i), r=self.fps, pix_fmt="yuv420p").run()
+            os.remove(tmpmp4.format(i - 1))
 
         # Save the file to desired location.
         if video_file is None:
             video_file = f"{self.submission.id}.mp4"
-        os.rename(self.tmp.format(i), video_file)
+        os.rename(tmpmp4.format(i), video_file)
 
         return video_file
