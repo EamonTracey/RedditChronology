@@ -24,7 +24,22 @@ class _RedditCommentMediaFactory(_TextMediaFactory):
     #   3. username
     #   4. comment
     #   5. score.
-    comment_html_format = """<style>.root{{background:#1a1a1b;padding:1em;font-family:sans-serif;font-size:1.25em;max-width:1080px;}}.top-container{{display:flex;align-items:center;gap:.35em}}.avatar{{border-radius:50%;height:2em;width:2em}}.username{{color:#d7dadc}}.ago{{font-size:.75em;color:#818384}}.line{{margin-left:1em;border-left:2px solid gray}}.middle-container{{display:flex;margin-top:.5em;margin-left:1em}}.comment{{color:#d7dadc;margin-left:.35em}}.bottom-container{{display:{};align-items:center;margin-top:1em;margin-left:1.35em;gap:.5em;color:#818384}}@font-face{{font-family:vote;src:url(https://www.redditstatic.com/desktop2x/fonts/redesignIcon2020/redesignFont2020.a59e78115daeedbd9ef7f241a25c2031.ttf)}}.icon{{font-family:vote;font-size:1.2em}}.upvote-icon:before{{content:"\\f34c"}}.votes{{color:#d7dadc}}.downvote-icon:before{{content:"\\f197"}}.comment-icon:before{{content:"\\f16f"}}.option{{font-size:.75em}}</style><div class=root><div class=top-container><img class=avatar src={}><div class=username>{}</div><div class=ago>·</div><div class=ago>sometime ago</div></div><div class=line><div class=middle-container><div class=comment>{}</div></div><div class=bottom-container><div class="icon upvote-icon"></div><div class=votes>{}</div><div class="icon downvote-icon"></div><div class="icon comment-icon"></div><div class=option><b>Reply</b></div><div class=option><b>Give Award</b></div><div class=option><b>Share</b></div><div class=option><b>Report</b></div><div class=option><b>Save</b></div><div class=option><b>Follow</b></div></div></div></div>"""
+    comment_html_format = """<style>.root{{background:#1a1a1b;padding:1em;font-family:sans-serif;font-size:1.25em;max
+    -width:1080px;}}.top-container{{display:flex;align-items:center;gap:.35em}}.avatar{{
+    border-radius:50%;height:2em;width:2em}}.username{{color:#d7dadc}}.ago{{font-size:.75em;color:#818384}}.line{{
+    margin-left:1em;border-left:2px solid gray}}.middle-container{{
+    display:flex;margin-top:.5em;margin-left:1em}}.comment{{color:#d7dadc;margin-left:.35em}}.bottom-container{{
+    display:{};align-items:center;margin-top:1em;margin-left:1.35em;gap:.5em;color:#818384}}@font-face{{
+    font-family:vote;src:url(https://www.redditstatic.com/desktop2x/fonts/redesignIcon2020/redesignFont2020
+    .a59e78115daeedbd9ef7f241a25c2031.ttf)}}.icon{{font-family:vote;font-size:1.2em}}.upvote-icon:before{{
+    content:"\\f34c"}}.votes{{color:#d7dadc}}.downvote-icon:before{{content:"\\f197"}}.comment-icon:before{{
+    content:"\\f16f"}}.option{{font-size:.75em}}</style><div class=root><div class=top-container><img class=avatar 
+    src={}><div class=username>{}</div><div class=ago>·</div><div class=ago>sometime ago</div></div><div 
+    class=line><div class=middle-container><div class=comment>{}</div></div><div class=bottom-container><div 
+    class="icon upvote-icon"></div><div class=votes>{}</div><div class="icon downvote-icon"></div><div class="icon 
+    comment-icon"></div><div class=option><b>Reply</b></div><div class=option><b>Give Award</b></div><div 
+    class=option><b>Share</b></div><div class=option><b>Report</b></div><div class=option><b>Save</b></div><div 
+    class=option><b>Follow</b></div></div></div></div> """
 
     def __init__(self, comment: praw.models.Comment,):
         self.comment = comment
