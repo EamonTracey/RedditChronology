@@ -106,7 +106,6 @@ class RedditThreadMediaFactory(_MediaFactory):
             mp4 = ffmpeg.input(tmpmp4.format(i - 1))
             concatenator = ffmpeg.concat(mp4.video, mp4.audio, *streams_chunk, v=1, a=1)
             concatenator.output(tmpmp4.format(i), r=self.fps, pix_fmt="yuv420p").run()
-            os.remove(tmpmp4.format(i - 1))
 
         # Save the file to desired location.
         if video_file is None:
