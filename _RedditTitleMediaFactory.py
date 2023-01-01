@@ -1,6 +1,7 @@
 import html
 import itertools
 import os
+import sys
 
 import praw.models
 from PIL import Image
@@ -44,10 +45,10 @@ class _RedditTitleMediaFactory(_TextMediaFactory):
                 self.submission.author.name,
                 cut
             )
-            self.hti.screenshot(html_str=title_html, save_as=self.tmphti)
+            self.hti.screenshot(html_str=title_html, save_as="RedditTitleMediaFactory.tmphti.png")
 
             # Next, crop the image because html2image isn't perfect.
-            comment_image = Image.open(self.tmphti)
+            comment_image = Image.open(os.path.join(self.tmpdir.name, "RedditTitleMediaFactory.tmphti.png"))
             comment_image = comment_image.crop(comment_image.getbbox())
 
             # Now, paste the image onto a blank background.

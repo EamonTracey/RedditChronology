@@ -1,3 +1,5 @@
+import contextlib
+import os
 import typing
 
 import ffmpeg
@@ -8,10 +10,10 @@ def media_duration(file: str):
     return float(probe["format"]["duration"])
 
 
-def chunk(coll: typing.Collection, size: int):
+def chunk(collection: typing.Collection, size: int):
     i = 0
-    while i < len(coll):
-        yield coll[i:i + size]
+    while i < len(collection):
+        yield collection[i:i + size]
         i += size
 
 

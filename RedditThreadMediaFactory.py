@@ -1,10 +1,8 @@
 import itertools
 import os
-import random
 
 import ffmpeg
 import praw.models
-from google.cloud import texttospeech
 
 from _RedditCommentMediaFactory import _RedditCommentMediaFactory
 from _RedditTitleMediaFactory import _RedditTitleMediaFactory
@@ -90,15 +88,7 @@ class RedditThreadMediaFactory:
 
         # Let's create a comment media factory for each comment.
         # We will use a random English (US) voice from Google's API.
-        comment_factories = [
-            _RedditCommentMediaFactory(
-                comment,
-                texttospeech.VoiceSelectionParams(
-                    language_code="en-US",
-                    name="en-US-Standard-" + random.choice("ABCDEFGHIJ")
-                )
-            ) for comment in self.relevant_comments
-        ]
+        comment_factories = [_RedditCommentMediaFactory(comment) for comment in self.relevant_comments]
 
         # Welcome to the meat of our operation.
         # We want to manufacture the image and audio files for each comment.
@@ -156,10 +146,5 @@ class RedditThreadMediaFactory:
         if video_file is None:
             video_file = f"{self.submission.id}.mp4"
         os.rename(self.tmp.format(i), video_file)
-
-        # Clean up temporary directories.
-        # title_factory.cleanup()
-        # for comment_factory in comment_factories:
-        #     comment_factory.cleanup()
 
         return video_file

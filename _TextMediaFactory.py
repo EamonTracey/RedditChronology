@@ -1,5 +1,4 @@
 import abc
-import os
 import random
 import re
 import tempfile
@@ -17,13 +16,11 @@ class _TextMediaFactory(abc.ABC):
     # split a string by repeating delimiters.
     cut_pattern = re.compile(rf"[^{cut_delimiters}]*[{cut_delimiters}]*")
 
-    hti = html2image.Html2Image()
-
     def __init__(self, text: str):
         self.text = text
         self.voice_params = self._random_voice_params()
         self.tmpdir = tempfile.TemporaryDirectory()
-        self.tmphti = os.path.join(self.tmpdir.name, "RedditTextMediaFactory.tmphti.png")
+        self.hti = html2image.Html2Image(output_path=self.tmpdir.name)
 
         # When manufacturing images and audio, we want
         # to cut the comment into natural fragments.

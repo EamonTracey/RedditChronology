@@ -72,10 +72,10 @@ class _RedditCommentMediaFactory(_TextMediaFactory):
                 cut,
                 utils.format_score(self.comment.score)
             )
-            self.hti.screenshot(html_str=comment_html, save_as=self.tmphti)
+            self.hti.screenshot(html_str=comment_html, save_as="RedditCommentMediaFactory.tmphti.png")
 
             # Next, crop the image because html2image isn't perfect.
-            comment_image = Image.open(self.tmphti)
+            comment_image = Image.open(os.path.join(self.tmpdir.name, "RedditCommentMediaFactory.tmphti.png"))
             comment_image = comment_image.crop(comment_image.getbbox())
 
             # Now, paste the image onto a blank background.
