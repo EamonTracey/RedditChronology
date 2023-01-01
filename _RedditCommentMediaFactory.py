@@ -41,7 +41,7 @@ class _RedditCommentMediaFactory(_TextMediaFactory):
     class=option><b>Share</b></div><div class=option><b>Report</b></div><div class=option><b>Save</b></div><div 
     class=option><b>Follow</b></div></div></div></div> """
 
-    def __init__(self, comment: praw.models.Comment,):
+    def __init__(self, comment: praw.models.Comment):
         self.comment = comment
 
         super(_RedditCommentMediaFactory, self).__init__(self.comment.body)

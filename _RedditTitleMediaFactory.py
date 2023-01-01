@@ -24,8 +24,8 @@ class _RedditTitleMediaFactory(_TextMediaFactory):
     margin-left:.75em}}.top-container{{display:flex;align-items:center;font-size:.65em;gap:.35em}}.avatar{{
     border-radius:50%;height:2em;width:2em}}.subreddit{{color:#d7dadc;font-weight:700}}.ago{{
     color:#818384}}.middle-container{{display:flex;margin-top:.5em}}.title{{
-    color:#d7dadc;font-size:1.25em}}.bottom-container{{display:{
-    };color:#818384;margin-top:1em;align-items:center;gap:.35em}}.comment-icon:before{{
+    color:#d7dadc;font-size:1.25em}}.bottom-container{{display:{}
+    ;color:#818384;margin-top:1em;align-items:center;gap:.35em}}.comment-icon:before{{
     content:"\\f16f"}}.award-icon:before{{content:"\\f123"}}.share-icon:before{{
     content:"\\f280"}}.ellipsis-icon:before{{content:"\\f229"}}.option{{
     font-size:.75em;margin-right:1em;font-weight:700}}</style><div class=root><div class=encompassing-container><div 

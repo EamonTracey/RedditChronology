@@ -11,16 +11,9 @@ import utils
 
 
 class RedditThreadMediaFactory(_MediaFactory):
-    def __init__(
-            self, submission: praw.models.Submission,
-            auto: bool = True,
-            n: int = 40,
-            fps: float = 25,
-            transition: tuple[str, str] = None
-    ):
+    def __init__(self, submission: praw.models.Submission, fps: float = 25, transition: tuple[str, str] = None):
         self.submission = submission
         self.fps = fps
-        self.n = n
         self.transition = transition
 
         # By default, praw does not load all comments at once.
@@ -28,40 +21,9 @@ class RedditThreadMediaFactory(_MediaFactory):
         submission.comments.replace_more(limit=0)
         self.comments = submission.comments
 
-        # If the user does not want the class to choose which comments to
-        # include, we have to prompt the user for the relevant comments.
-        self.relevant_comments = self._choose_relevant_comments() if auto else self._prompt_relevant_comments()
-
         super(RedditThreadMediaFactory, self).__init__()
 
-    def _choose_relevant_comments(self) -> list[praw.models.Comment]:
-        return list(
-            filter(
-                lambda c: c.author is not None,
-                self.comments[:self.n]
-            )
-        )
-
-    def _prompt_relevant_comments(self) -> list[praw.models.Comment]:
-        relevant_comments = []
-        for i, comment in enumerate(self.comments):
-            print(comment.body)
-
-            while (query := input("Accept? ")) not in ["y", "n", "q"]:
-                pass
-
-            if query == "y":
-                relevant_comments.append(comment)
-                print("Accepted.\n")
-            elif query == "n":
-                print("Rejected.\n")
-            elif query == "q":
-                print("Rejected.\n")
-                break
-
-        return relevant_comments
-
-    def manufacture_video(self, video_file: str = None) -> str:
+    def manufacture_video(self, video_file: str = None, comments: list[praw.models.Comment] = None) -> str:
         streams = []
 
         # First, let's manufacture the title.
@@ -89,7 +51,9 @@ class RedditThreadMediaFactory(_MediaFactory):
 
         # Let's create a comment media factory for each comment.
         # We will use a random English (US) voice from Google's API.
-        comment_factories = [_RedditCommentMediaFactory(comment) for comment in self.relevant_comments]
+        if comments is None:
+            comments = self.comments
+        comment_factories = [_RedditCommentMediaFactory(comment) for comment in comments]
 
         # Welcome to the meat of our operation.
         # We want to manufacture the image and audio files for each comment.

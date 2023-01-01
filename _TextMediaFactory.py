@@ -18,6 +18,8 @@ class _TextMediaFactory(_MediaFactory, abc.ABC):
     cut_pattern = re.compile(rf"[^{cut_delimiters}]*[{cut_delimiters}]*")
 
     def __init__(self, text: str):
+        super(_TextMediaFactory, self).__init__()
+
         self.text = text
         self.voice_params = self._random_voice_params()
         self.hti = html2image.Html2Image(output_path=self.tmpdir.name)
@@ -28,8 +30,6 @@ class _TextMediaFactory(_MediaFactory, abc.ABC):
         # punctuation including periods, ellipses, commas,
         # colons, question marks, and exclamation points.
         self.text_cuts = self._load_text_cuts()
-
-        super(_TextMediaFactory, self).__init__()
 
     def _load_text_cuts(self) -> list[str]:
         # Cut the text using our regex pattern from above.
