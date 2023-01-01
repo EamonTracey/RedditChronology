@@ -5,7 +5,7 @@ from simple_youtube_api.LocalVideo import LocalVideo
 class YouTubeUploader:
     def __init__(
             self,
-            vfile: str,
+            video_file: str,
             credentials: str,
             storage: str,
             /,
@@ -21,7 +21,7 @@ class YouTubeUploader:
             privacy_status: str = "public",
             public_stats_viewable: bool = True,
     ):
-        self.vfile = vfile
+        self.video_file = video_file
         self.thumbnail = thumbnail
         self.title = title
         self.description = description
@@ -40,8 +40,8 @@ class YouTubeUploader:
         channel.login(credentials, storage)
         return channel
 
-    def push(self):
-        video = LocalVideo(self.vfile)
+    def upload(self):
+        video = LocalVideo(self.video_file)
         video.set_thumbnail_path(self.thumbnail)
         video.set_title(self.title)
         video.set_description(self.description)

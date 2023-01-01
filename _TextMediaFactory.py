@@ -1,6 +1,8 @@
 import abc
+import os
 import random
 import re
+import tempfile
 
 import html2image
 from google.cloud import texttospeech
@@ -17,13 +19,11 @@ class _TextMediaFactory(abc.ABC):
 
     hti = html2image.Html2Image()
 
-    def __init__(self, text: str, pdir: str, voice_params: texttospeech.VoiceSelectionParams = None):
+    def __init__(self, text: str):
         self.text = text
-        self.pdir = pdir
-
-        if voice_params is None:
-            voice_params = self._random_voice_params()
-        self.voice_params = voice_params
+        self.voice_params = self._random_voice_params()
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.tmphti = os.path.join(self.tmpdir.name, "RedditTextMediaFactory.tmphti.png")
 
         # When manufacturing images and audio, we want
         # to cut the comment into natural fragments.

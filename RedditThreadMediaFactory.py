@@ -16,7 +16,6 @@ class RedditThreadMediaFactory:
 
     def __init__(
             self, submission: praw.models.Submission,
-            wdir: str = ".",
             auto: bool = True,
             n: int = 40,
             fps: float = 25,
@@ -26,15 +25,6 @@ class RedditThreadMediaFactory:
         self.fps = fps
         self.n = n
         self.transition = transition
-
-        # wdir stands for working directory.
-        # This directory will serve as the root directory
-        # housing the project directory (pdir).
-        self.wdir = wdir
-        self.pdir = f"{wdir}/{submission.id}"
-
-        # Build our factory AKA make the project directory.
-        os.mkdir(self.pdir)
 
         # By default, praw does not load all comments at once.
         # However, we want to fetch all the comments.
@@ -58,37 +48,37 @@ class RedditThreadMediaFactory:
         for i, comment in enumerate(self.comments):
             print(comment.body)
 
-            while (q := input("Accept? ")) not in ["y", "n", "q"]:
+            while (query := input("Accept? ")) not in ["y", "n", "q"]:
                 pass
 
-            if q == "y":
+            if query == "y":
                 relevant_comments.append(comment)
                 print("Accepted.\n")
-            elif q == "n":
+            elif query == "n":
                 print("Rejected.\n")
-            elif q == "q":
+            elif query == "q":
                 print("Rejected.\n")
                 break
 
         return relevant_comments
 
-    def manufacture_video(self, vfile: str = None) -> str:
+    def manufacture_video(self, video_file: str = None) -> str:
         streams = []
 
         # First, let's manufacture the title.
-        title_factory = _RedditTitleMediaFactory(self.submission, self.pdir)
-        title_ifiles = title_factory.manufacture_images()
-        title_afiles = title_factory.manufacture_audios()
+        title_factory = _RedditTitleMediaFactory(self.submission)
+        title_image_files = title_factory.manufacture_images()
+        title_audio_files = title_factory.manufacture_audios()
 
         # Then, create the ffmpeg input streams for the title.
         # View comment below to understand how we calculate framemrate.
         streams.extend(
             itertools.chain.from_iterable(
                 (
-                    ffmpeg.input(ifile, framerate=1 / (mlen := utils.media_duration(afile)), t=mlen),
-                    ffmpeg.input(afile)
+                    ffmpeg.input(image_file, framerate=1 / (mlen := utils.media_duration(audio_file)), t=mlen),
+                    ffmpeg.input(audio_file)
                 )
-                for ifile, afile in zip(title_ifiles, title_afiles)
+                for image_file, audio_file in zip(title_image_files, title_audio_files)
             )
         )
 
@@ -103,7 +93,6 @@ class RedditThreadMediaFactory:
         comment_factories = [
             _RedditCommentMediaFactory(
                 comment,
-                self.pdir,
                 texttospeech.VoiceSelectionParams(
                     language_code="en-US",
                     name="en-US-Standard-" + random.choice("ABCDEFGHIJ")
@@ -155,7 +144,7 @@ class RedditThreadMediaFactory:
         # We set the pixel format to yuv420p so that more
         # media players (e.g., QuickTime) support our mp4.
         concatenator.output(self.tmp.format(i), r=self.fps, pix_fmt="yuv420p").run()
-        # We are done if the number of streams is less than or equal to 32
+        # We are done if the number of streams is less than or equal to 32.
         # Otherwise, concatenate the rest of the streams to the mp4 in chunks.
         for i, streams_chunk in enumerate(utils.chunk(streams[32:], 32), start=1):
             mp4 = ffmpeg.input(self.tmp.format(i - 1))
@@ -163,8 +152,14 @@ class RedditThreadMediaFactory:
             concatenator.output(self.tmp.format(i), r=self.fps, pix_fmt="yuv420p").run()
             os.remove(self.tmp.format(i - 1))
 
-        if vfile is None:
-            vfile = f"{self.pdir}/{self.submission.id}.mp4"
-        os.rename(self.tmp.format(i), vfile)
+        # Save the file to desired location.
+        if video_file is None:
+            video_file = f"{self.submission.id}.mp4"
+        os.rename(self.tmp.format(i), video_file)
 
-        return vfile
+        # Clean up temporary directories.
+        # title_factory.cleanup()
+        # for comment_factory in comment_factories:
+        #     comment_factory.cleanup()
+
+        return video_file
