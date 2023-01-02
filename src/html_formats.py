@@ -1,6 +1,6 @@
 # This string is html that displays a Reddit title,
 # or at least my best recreation of a Reddit title.
-# The string should be formatted with 4 parameters:
+# The string should be formatted with 6 parameters:
 #   1. display bottom container
 #   2. score
 #   3. icon url
