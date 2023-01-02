@@ -97,7 +97,11 @@
     </div>
     <div class="line">
         <div class="middle-container">
-            <div class="comment">[comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment]</div>
+            <div class="comment">[comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment] [comment]</div>
+            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+            <script>
+                document.querySelectorAll(".comment").forEach(e => e.innerHTML = marked.parse(e.innerHTML))
+            </script>
         </div>
         <div class="bottom-container">
             <div class="icon upvote-icon"></div>

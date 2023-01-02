@@ -1,6 +1,6 @@
 import html2image
 
-from _MediaFactory import _MediaFactory
+from ._MediaFactory import _MediaFactory
 
 
 class _HTIMediaFactory(_MediaFactory):

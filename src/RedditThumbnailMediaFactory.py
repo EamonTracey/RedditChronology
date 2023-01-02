@@ -4,9 +4,9 @@ import os
 from PIL import Image
 import praw.models
 
-from html_formats import title_html_format
-from _HTIMediaFactory import _HTIMediaFactory
-import utils
+from .html_formats import title_html_format
+from ._HTIMediaFactory import _HTIMediaFactory
+from .utils import format_score
 
 
 class RedditThumbnailMediaFactory(_HTIMediaFactory):
@@ -20,7 +20,7 @@ class RedditThumbnailMediaFactory(_HTIMediaFactory):
 
         title_html = title_html_format.format(
             "flex",
-            utils.format_score(self.submission.score),
+            format_score(self.submission.score),
             self.submission.subreddit.icon_img,
             self.submission.subreddit.display_name,
             self.submission.author.name,

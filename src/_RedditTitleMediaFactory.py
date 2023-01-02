@@ -6,15 +6,15 @@ import praw.models
 from PIL import Image
 from google.cloud import texttospeech
 
-from html_formats import title_html_format
-from _HTIMediaFactory import _HTIMediaFactory
-import utils
+from .html_formats import title_html_format
+from ._HTIMediaFactory import _HTIMediaFactory
+from .utils import format_score, random_voice_params, text_cuts
 
 
 class _RedditTitleMediaFactory(_HTIMediaFactory):
     def __init__(self, submission: praw.models.Submission):
         self.submission = submission
-        self._text_cuts = utils.text_cuts(self.submission.title)
+        self._text_cuts = text_cuts(self.submission.title)
 
         super(_RedditTitleMediaFactory, self).__init__()
 
@@ -34,7 +34,7 @@ class _RedditTitleMediaFactory(_HTIMediaFactory):
             # we are up to the last cut.
             title_html = title_html_format.format(
                 "flex" if i == len(self._text_cuts) - 1 else "none",
-                utils.format_score(self.submission.score),
+                format_score(self.submission.score),
                 self.submission.subreddit.icon_img,
                 self.submission.subreddit.display_name,
                 getattr(self.submission.author, "name", "anonymous"),
@@ -79,7 +79,7 @@ class _RedditTitleMediaFactory(_HTIMediaFactory):
             synthesis_input = texttospeech.SynthesisInput(ssml=ssml)
             response = client.synthesize_speech(
                 input=synthesis_input,
-                voice=utils.random_voice_params(),
+                voice=random_voice_params(),
                 audio_config=audio_config
             )
 

@@ -7,9 +7,9 @@ from PIL import Image
 import praw.models
 from google.cloud import texttospeech
 
-from html_formats import comment_html_format
-from _HTIMediaFactory import _HTIMediaFactory
-import utils
+from .html_formats import comment_html_format
+from ._HTIMediaFactory import _HTIMediaFactory
+from .utils import format_score, random_voice_params, text_cuts
 
 
 class _RedditCommentMediaFactory(_HTIMediaFactory):
@@ -19,7 +19,7 @@ class _RedditCommentMediaFactory(_HTIMediaFactory):
 
     def __init__(self, comment: praw.models.Comment):
         self.comment = comment
-        self._text_cuts = utils.text_cuts(self.comment.body)
+        self._text_cuts = text_cuts(self.comment.body)
 
         super(_RedditCommentMediaFactory, self).__init__()
 
@@ -62,7 +62,7 @@ class _RedditCommentMediaFactory(_HTIMediaFactory):
                 pfp_url,
                 getattr(self.comment.author, "name", "anonymous"),
                 cut,
-                utils.format_score(self.comment.score)
+                format_score(self.comment.score)
             )
             self.hti.screenshot(html_str=comment_html, save_as="RedditCommentMediaFactory.tmphti.png")
 
@@ -103,7 +103,7 @@ class _RedditCommentMediaFactory(_HTIMediaFactory):
             synthesis_input = texttospeech.SynthesisInput(ssml=ssml)
             response = client.synthesize_speech(
                 input=synthesis_input,
-                voice=utils.random_voice_params(),
+                voice=random_voice_params(),
                 audio_config=audio_config
             )
 

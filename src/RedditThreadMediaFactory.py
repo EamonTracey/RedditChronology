@@ -4,10 +4,10 @@ import os
 import ffmpeg
 import praw.models
 
-from _RedditCommentMediaFactory import _RedditCommentMediaFactory
-from _MediaFactory import _MediaFactory
-from _RedditTitleMediaFactory import _RedditTitleMediaFactory
-import utils
+from ._RedditCommentMediaFactory import _RedditCommentMediaFactory
+from ._MediaFactory import _MediaFactory
+from ._RedditTitleMediaFactory import _RedditTitleMediaFactory
+from .utils import chunk, media_duration
 
 
 class RedditThreadMediaFactory(_MediaFactory):
@@ -36,7 +36,7 @@ class RedditThreadMediaFactory(_MediaFactory):
         streams.extend(
             itertools.chain.from_iterable(
                 (
-                    ffmpeg.input(image_file, framerate=1 / (mlen := utils.media_duration(audio_file)), t=mlen),
+                    ffmpeg.input(image_file, framerate=1 / (mlen := media_duration(audio_file)), t=mlen),
                     ffmpeg.input(audio_file)
                 )
                 for image_file, audio_file in zip(title_image_files, title_audio_files)
@@ -71,7 +71,7 @@ class RedditThreadMediaFactory(_MediaFactory):
             streams.extend(
                 itertools.chain.from_iterable(
                     (
-                        ffmpeg.input(ifile, framerate=1 / (mlen := utils.media_duration(afile)), t=mlen),
+                        ffmpeg.input(ifile, framerate=1 / (mlen := media_duration(afile)), t=mlen),
                         ffmpeg.input(afile),
                     )
                     for ifile, afile in zip(comment_ifiles, comment_afiles)
@@ -102,7 +102,7 @@ class RedditThreadMediaFactory(_MediaFactory):
         concatenator.output(tmpmp4.format(i), r=self.fps, pix_fmt="yuv420p").run()
         # We are done if the number of streams is less than or equal to 32.
         # Otherwise, concatenate the rest of the streams to the mp4 in chunks.
-        for i, streams_chunk in enumerate(utils.chunk(streams[32:], 32), start=1):
+        for i, streams_chunk in enumerate(chunk(streams[32:], 32), start=1):
             mp4 = ffmpeg.input(tmpmp4.format(i - 1))
             concatenator = ffmpeg.concat(mp4.video, mp4.audio, *streams_chunk, v=1, a=1)
             concatenator.output(tmpmp4.format(i), r=self.fps, pix_fmt="yuv420p").run()
