@@ -13,8 +13,8 @@ class YouTubeUploader:
             thumbnail: str,
             title: str,
             description: str,
+            category: str,
             tags: list[str] = None,
-            category: str = "",
             default_language: str = "en-US",
             embeddable: bool = True,
             license_: str = "creativeCommon",
@@ -25,8 +25,8 @@ class YouTubeUploader:
         self.thumbnail = thumbnail
         self.title = title
         self.description = description
-        self.tags = tags
         self.category = category
+        self.tags = tags
         self.default_language = default_language
         self.embeddable = embeddable
         self.license = license_
@@ -45,8 +45,8 @@ class YouTubeUploader:
         video.set_thumbnail_path(self.thumbnail)
         video.set_title(self.title)
         video.set_description(self.description)
-        video.set_tags(self.tags or [])
         video.set_category(self.category)
+        video.set_tags(self.tags or [])
         video.set_default_language(self.default_language)
         video.set_embeddable(self.embeddable)
         video.set_license(self.license)

@@ -6,51 +6,22 @@ import praw.models
 from PIL import Image
 from google.cloud import texttospeech
 
-from _TextMediaFactory import _TextMediaFactory
+from html_formats import title_html_format
+from _HTIMediaFactory import _HTIMediaFactory
 import utils
 
 
-class _RedditTitleMediaFactory(_TextMediaFactory):
-    # This string is html that displays a Reddit title,
-    # or at least my best recreation of a Reddit title.
-    # The string should be formatted with 4 parameters:
-    # 1) display bottom container 2) score 3) icon url 4) subreddit name 5) username 6) title
-    title_html_format = "<style>.root{{background:#1a1a1b;padding:1em;font-family:sans-serif;font-size:2em;max-width" \
-                        ":1080px}}.encompassing-container{{display:flex}}.left-container{{" \
-                        "display:flex;flex-direction:column;align-items:center;color:#818384;font-size:1em;gap:.2em" \
-                        "}}@font-face{{font-family:vote;src:url(" \
-                        "https://www.redditstatic.com/desktop2x/fonts/redesignIcon2020/redesignFont2020" \
-                        ".a59e78115daeedbd9ef7f241a25c2031.ttf)}}.icon{{" \
-                        "font-family:vote;font-size:1.2em}}.upvote-icon:before{{content:\"\\f34c\"}}.votes{{" \
-                        "color:#d7dadc}}.downvote-icon:before{{content:\"\\f197\"}}.right-container{{" \
-                        "margin-left:.75em}}.top-container{{" \
-                        "display:flex;align-items:center;font-size:.65em;gap:.35em}}.avatar{{" \
-                        "border-radius:50%;height:2em;width:2em}}.subreddit{{color:#d7dadc;font-weight:700}}.ago{{" \
-                        "color:#818384}}.middle-container{{display:flex;margin-top:.5em}}.title{{" \
-                        "color:#d7dadc;font-size:1.25em}}.bottom-container{{display:{" \
-                        "};color:#818384;margin-top:1em;align-items:center;gap:.35em}}.comment-icon:before{{" \
-                        "content:\"\\f16f\"}}.award-icon:before{{content:\"\\f123\"}}.share-icon:before{{" \
-                        "content:\"\\f280\"}}.ellipsis-icon:before{{content:\"\\f229\"}}.option{{" \
-                        "font-size:.75em;margin-right:1em;font-weight:700}}</style><div class=root><div " \
-                        "class=encompassing-container><div class=left-container><div class=\"icon " \
-                        "upvote-icon\"></div><div class=votes>{}</div><div class=\"icon " \
-                        "downvote-icon\"></div></div><div class=right-container><div class=top-container><img " \
-                        "class=avatar src={}><div class=subreddit>r/{}</div><div class=ago>·</div><div " \
-                        "class=ago>Posted by u/{}</div></div><div class=middle-container><div class=title>{" \
-                        "}</div></div><div class=bottom-container><div class=\"icon comment-icon\"></div><div " \
-                        "class=option>Comment</div><div class=\"icon award-icon\"></div><div " \
-                        "class=option>Award</div><div class=\"icon share-icon\"></div><div " \
-                        "class=option>Share</div><div class=\"icon ellipsis-icon\"></div></div></div></div></div>"
-
+class _RedditTitleMediaFactory(_HTIMediaFactory):
     def __init__(self, submission: praw.models.Submission):
         self.submission = submission
+        self._text_cuts = utils.text_cuts(self.submission.title)
 
-        super(_RedditTitleMediaFactory, self).__init__(self.submission.title)
+        super(_RedditTitleMediaFactory, self).__init__()
 
     def manufacture_images(self) -> list[str]:
         image_files = []
 
-        for i, cut in enumerate(itertools.accumulate(self.text_cuts)):
+        for i, cut in enumerate(itertools.accumulate(self._text_cuts)):
             # Note that there are probably various pesky
             # annoyances with our html approach, so let's solve
             # everything hand-wavily with html.escape
@@ -61,25 +32,25 @@ class _RedditTitleMediaFactory(_TextMediaFactory):
             # Note the first parameter in the format call.
             # It specifies that the bottom container display only if
             # we are up to the last cut.
-            title_html = self.title_html_format.format(
-                "flex" if i == len(self.text_cuts) - 1 else "none",
+            title_html = title_html_format.format(
+                "flex" if i == len(self._text_cuts) - 1 else "none",
                 utils.format_score(self.submission.score),
                 self.submission.subreddit.icon_img,
                 self.submission.subreddit.display_name,
-                self.submission.author.name,
+                getattr(self.submission.author, "name", "anonymous"),
                 cut
             )
             self.hti.screenshot(html_str=title_html, save_as="RedditTitleMediaFactory.tmphti.png")
 
             # Next, crop the image because html2image isn't perfect.
-            comment_image = Image.open(os.path.join(self.tmpdir.name, "RedditTitleMediaFactory.tmphti.png"))
-            comment_image = comment_image.crop(comment_image.getbbox())
+            title_image = Image.open(os.path.join(self.tmpdir.name, "RedditTitleMediaFactory.tmphti.png"))
+            title_image = title_image.crop(title_image.getbbox())
 
             # Now, paste the image onto a blank background.
             # (26, 26, 27) are the RGB values corresponding to
             # hex color #1A1A1B, the comment background color.
             background = Image.new("RGB", (2560, 1440), (26, 26, 27))
-            background.paste(comment_image, (0, (background.height - comment_image.height) // 2))
+            background.paste(title_image, (0, (background.height - title_image.height) // 2))
 
             # Finally, write the final image to disk.
             image_file = os.path.join(self.tmpdir.name, f"{self.submission.id}.{i}.png")
@@ -98,7 +69,7 @@ class _RedditTitleMediaFactory(_TextMediaFactory):
 
         # Loop through all cuts.
         # We are saving each audio segment individually.
-        for i, cut in enumerate(self.text_cuts):
+        for i, cut in enumerate(self._text_cuts):
             # We need to escape the html as to not confuse
             # Google Cloud's text-to-speech API.
             ssml = html.escape(cut)
@@ -108,7 +79,7 @@ class _RedditTitleMediaFactory(_TextMediaFactory):
             synthesis_input = texttospeech.SynthesisInput(ssml=ssml)
             response = client.synthesize_speech(
                 input=synthesis_input,
-                voice=self.voice_params,
+                voice=utils.random_voice_params(),
                 audio_config=audio_config
             )
 

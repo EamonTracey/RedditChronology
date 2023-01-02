@@ -7,49 +7,21 @@ from PIL import Image
 import praw.models
 from google.cloud import texttospeech
 
-from _TextMediaFactory import _TextMediaFactory
+from html_formats import comment_html_format
+from _HTIMediaFactory import _HTIMediaFactory
 import utils
 
 
-class _RedditCommentMediaFactory(_TextMediaFactory):
+class _RedditCommentMediaFactory(_HTIMediaFactory):
     # These hex codes correspond to background colors for default reddit avatars.
     # They are present in URLs that return default reddit avatar images.
     avatar_colors = ["0079D3", "0DD3BB", "24A0ED", "FF4500", "FF8717", "FFB000"]
 
-    # This string is html that displays a Reddit comment,
-    # or at least my best recreation of a Reddit comment.
-    # The string should be formatted with 5 parameters:
-    #   1. display bottom container
-    #   2. pfp url
-    #   3. username
-    #   4. comment
-    #   5. score.
-    comment_html_format = "<style>.root{{background:#1a1a1b;padding:1em;font-family:sans-serif;font-size:1.25em;max" \
-                          "-width:1080px;}}.top-container{{display:flex;align-items:center;gap:.35em}}.avatar{{" \
-                          "border-radius:50%;height:2em;width:2em}}.username{{color:#d7dadc}}.ago{{" \
-                          "font-size:.75em;color:#818384}}.line{{margin-left:1em;border-left:2px solid " \
-                          "gray}}.middle-container{{display:flex;margin-top:.5em;margin-left:1em}}.comment{{" \
-                          "color:#d7dadc;margin-left:.35em}}.bottom-container{{display:{" \
-                          "};align-items:center;margin-top:1em;margin-left:1.35em;gap:.5em;color:#818384}}@font-face{" \
-                          "{font-family:vote;src:url(" \
-                          "https://www.redditstatic.com/desktop2x/fonts/redesignIcon2020/redesignFont2020" \
-                          ".a59e78115daeedbd9ef7f241a25c2031.ttf)}}.icon{{" \
-                          "font-family:vote;font-size:1.2em}}.upvote-icon:before{{content:\"\\f34c\"}}.votes{{" \
-                          "color:#d7dadc}}.downvote-icon:before{{content:\"\\f197\"}}.comment-icon:before{{" \
-                          "content:\"\\f16f\"}}.option{{font-size:.75em}}</style><div class=root><div " \
-                          "class=top-container><img class=avatar src={}><div class=username>{}</div><div " \
-                          "class=ago>·</div><div class=ago>sometime ago</div></div><div class=line><div " \
-                          "class=middle-container><div class=comment>{}</div></div><div class=bottom-container><div " \
-                          "class=\"icon upvote-icon\"></div><div class=votes>{}</div><div class=\"icon " \
-                          "downvote-icon\"></div><div class=\"icon comment-icon\"></div><div " \
-                          "class=option><b>Reply</b></div><div class=option><b>Give Award</b></div><div " \
-                          "class=option><b>Share</b></div><div class=option><b>Report</b></div><div " \
-                          "class=option><b>Save</b></div><div class=option><b>Follow</b></div></div></div></div> "
-
     def __init__(self, comment: praw.models.Comment):
         self.comment = comment
+        self._text_cuts = utils.text_cuts(self.comment.body)
 
-        super(_RedditCommentMediaFactory, self).__init__(self.comment.body)
+        super(_RedditCommentMediaFactory, self).__init__()
 
     @classmethod
     def randavatarurl(cls):
@@ -71,7 +43,7 @@ class _RedditCommentMediaFactory(_TextMediaFactory):
         # Loop through the accumulation of cuts.
         # We want to save an image of the comment
         # with each cut and its preceding text.
-        for i, cut in enumerate(itertools.accumulate(self.text_cuts)):
+        for i, cut in enumerate(itertools.accumulate(self._text_cuts)):
             # Note that there are probably various pesky
             # annoyances with our html approach, so let's solve
             # everything hand-wavily with html.escape
@@ -85,10 +57,10 @@ class _RedditCommentMediaFactory(_TextMediaFactory):
             # Note the first parameter in the format call.
             # It specifies that the bottom container display only if
             # we are up to the last cut.
-            comment_html = self.comment_html_format.format(
-                "flex" if i == len(self.text_cuts) - 1 else "none",
+            comment_html = comment_html_format.format(
+                "flex" if i == len(self._text_cuts) - 1 else "none",
                 pfp_url,
-                self.comment.author.name,
+                getattr(self.comment.author, "name", "anonymous"),
                 cut,
                 utils.format_score(self.comment.score)
             )
@@ -121,7 +93,7 @@ class _RedditCommentMediaFactory(_TextMediaFactory):
 
         # Loop through all cuts.
         # We are saving each audio segment individually.
-        for i, cut in enumerate(self.text_cuts):
+        for i, cut in enumerate(self._text_cuts):
             # We need to escape the html as to not confuse
             # Google Cloud's text-to-speech API.
             ssml = html.escape(cut)
@@ -131,7 +103,7 @@ class _RedditCommentMediaFactory(_TextMediaFactory):
             synthesis_input = texttospeech.SynthesisInput(ssml=ssml)
             response = client.synthesize_speech(
                 input=synthesis_input,
-                voice=self.voice_params,
+                voice=utils.random_voice_params(),
                 audio_config=audio_config
             )
 
